@@ -1,0 +1,49 @@
+<%- include('./includes/head.ejs') %>
+</head>
+<body>
+    <h1>This is a test!</h1>
+    <main>
+        <form action="/" method="POST">
+            <div>
+                <label for="year">Year</label>
+                <input type="text" name="year" id="year">                
+            </div>
+            <button class="btn" type="submit">Submit</button>
+        </form>
+    </main>
+    <section>
+        <canvas id="myChart" width="600" height="300"></canvas>
+<script>
+
+const ctx = document.getElementById('myChart').getContext('2d');
+const myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['Average Runtime <%- year%>'],
+        datasets: [{
+            label: 'Average Runtime',
+            data: [<%- value %>],
+            backgroundColor: [                
+                'rgba(54, 162, 235, 0.2)',               
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        },
+        responsive: false
+    }
+});
+</script>
+
+    </section>
+
+
+<% include('./includes/end.ejs') %>

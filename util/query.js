@@ -1,5 +1,5 @@
 const oracledb = require('oracledb');
-const dbconfig = require('./configdb.js');
+const dbconfig = require('./dbconfig.js');
 
 async function query(statement){
     let connection;
