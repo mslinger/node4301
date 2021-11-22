@@ -11,7 +11,7 @@ const queryRoutes = require('./routes/queries.js');
 const homeRoutes = require('./routes/home.js');
 
 app.use(express.urlencoded({ extended: true }))
-// app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(queryRoutes);
 app.use(homeRoutes);

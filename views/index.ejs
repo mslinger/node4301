@@ -1,49 +1,18 @@
 <%- include('./includes/head.ejs') %>
 </head>
 <body>
-    <h1>This is a test!</h1>
-    <main>
-        <form action="/" method="POST">
-            <div>
-                <label for="year">Year</label>
-                <input type="text" name="year" id="year">                
-            </div>
-            <button class="btn" type="submit">Submit</button>
-        </form>
-    </main>
-    <section>
-        <canvas id="myChart" width="600" height="300"></canvas>
-<script>
+    <%- include('./includes/nav.ejs') %>
+    <div class="section no-pad-bot" id="index-banner">
+        <div class="container">
+          <br><br>
+          <h1 class="header center deep-purple-text text-darken-1">Welcome to Flix!</h1>
+          <div class="row center">
+            <h5 class="header col s12 light">Currently containing INSERT NUMBER movies</h5>
+          </div>
+          </div>
+          <div class="container">
+            <p>Our motivation to create a Movie Web app serves to not only join our joint passion for movies but to describe movie review data in a trend analysis manner. We plan on addressing the best films to watch through queries detailed out in our Reviews Section. We hope you enjoy our website</p>
+          </div>
+    </div>   
 
-const ctx = document.getElementById('myChart').getContext('2d');
-const myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: ['Average Runtime <%- year%>'],
-        datasets: [{
-            label: 'Average Runtime',
-            data: [<%- value %>],
-            backgroundColor: [                
-                'rgba(54, 162, 235, 0.2)',               
-            ],
-            borderColor: [
-                'rgba(255, 99, 132, 1)'
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        },
-        responsive: false
-    }
-});
-</script>
-
-    </section>
-
-
-<% include('./includes/end.ejs') %>
+<%- include('./includes/end.ejs') %>
