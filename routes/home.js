@@ -9,7 +9,10 @@ router.get('/', async (req, res, next) => {
 
     //value and year are zero due to initial loading of the graph
     //Can figure that out later
-    res.render('index.ejs', {pagetitle: "Flix", color1: 'rgba(245, 40, 145, 0.8)', value: 0, year: 0});   
+    const statement = `SELECT COUNT(ID) FROM Movie;`;
+    const result = await query(statement);
+
+    res.render('index.ejs', {pagetitle: "Flix", movies: result[0][0]});   
 });
 
 router.post('/', async (req, res, next) => {
