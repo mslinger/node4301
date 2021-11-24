@@ -9,10 +9,10 @@ router.get('/', async (req, res, next) => {
 
     //value and year are zero due to initial loading of the graph
     //Can figure that out later
-    const statement = `SELECT COUNT(ID) FROM Movie;`;
+    const statement = `SELECT COUNT(ID) FROM Movie`;
     const result = await query(statement);
 
-    res.render('index.ejs', {pagetitle: "Flix", movies: result[0][0]});   
+    res.render('index.ejs', {pagetitle: "Flix", movies: result});   
 });
 
 router.post('/', async (req, res, next) => {

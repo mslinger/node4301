@@ -11,8 +11,10 @@
     </div>
     <div class="container">
         <div class="row">
+            <div class="col m6 offset-m3">
             <div class="card grey lighten-4 z-depth-2">
                 <div class="card-content pink-text darken-3">
+                    <span class="card-title">Number of Films By Genre Per Year</span>
                     <form action="/queryone" method="POST">
                     <div class="input field">
                         <label for="year">Year</label>
@@ -22,7 +24,55 @@
                     <button class="btn purple darken-1" type="submit">Submit</button>
                 </div>
             </div>
+            </div>
         </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <canvas id="myChart" width="900" height="500"></canvas>
+            <script>
+                let result_array = <%- JSON.stringify(data)%>;
+
+                let data_labels = [];
+                let data_values = [];
+
+                for(let i=0; i < result_array.length; i++){
+
+                    if(result_array[i][0] != null && result_array[i][1] != 0){
+                        data_labels.push(result_array[i][0]);
+                        data_values.push(result_array[i][1]);
+                    }
+                }
+
+                const ctx = document.getElementById('myChart').getContext('2d');
+                const myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data_labels,
+                        datasets: [{
+                            label: 'Number of Films <%= year %>',
+                            data: data_values,
+                            backgroundColor: [
+                                'rgba(54, 162, 235, 0.65)',
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y:{
+                                beginAtZero: true
+                            }
+                        },
+                        responsive: false
+                    }
+                });
+            </script>
+        </div>
+
     </div>
 
 <%- include('./includes/end.ejs') %>
