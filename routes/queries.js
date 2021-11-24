@@ -5,13 +5,13 @@ const query = require('../util/query.js')
 const router = express.Router();
 
 router.get('/queryone', (req, res, next) => {
-    res.render('queryone.ejs', {pagetitle: "Flix - Query One", data: 0}); 
+    res.render('queryone.ejs', {pagetitle: "Flix - Query One", data: 0, year: 0}); 
 });
 
 router.post('/queryone', async (req, res, next) => {
 
     const input_year = req.body.year;
-    const statement = `SELECT GenreType(Runtime), COUNT(GenreType) FROM (SELECT GenreType FROM Movie JOIN Genre on Movie.ID = Genre.MovieID WHERE Year = ${input_year}) GROUP BY GenreType`;
+    const statement = `SELECT GenreType, COUNT(GenreType) FROM (SELECT GenreType FROM Movie JOIN Genre on Movie.ID = Genre.MovieID WHERE Year = ${input_year}) GROUP BY GenreType`;
     const result = await query(statement);
 
     res.render('queryone.ejs', {pagetitle: "Flix - Query One", year: input_year, data: result}); 
