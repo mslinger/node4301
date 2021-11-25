@@ -18,15 +18,14 @@
                     <form action="/queryone" method="POST">
                     <div class="input field">
                         <label for="year">Year</label>
-                        <input class="validate" type="number" name="year" min="1970" max="2020">        
-                        
+                        <input class="validate" type="number" name="year" min="1970" max="2020">                        
                     </div>
                     <div>
-                    <label for="descending" style="margin: 5px;">
+                    <label style="margin: 5px;">
                         <input type="checkbox" class="filled-in" name="descending"/>
                         <span>Descending</span>
                     </label>
-                    <label for="ascending" style="margin: 5px">
+                    <label style="margin: 5px">
                         <input type="checkbox" class="filled-in" name="ascending"/>
                         <span>Ascending</span>
                     </label>
@@ -43,7 +42,8 @@
         <div class="row">            
             <canvas id="myChart" width="900" height="500"></canvas>
             <script>
-                let result_array = <%- JSON.stringify(data)%>;
+                let result_array = '<%- JSON.stringify(data)%>';
+                result_array = JSON.parse(result_array);
 
                 let data_labels = [];
                 let data_values = [];
@@ -84,7 +84,6 @@
                 });
             </script>
         </div>
-
     </div>
 
 <%- include('./includes/end.ejs') %>
