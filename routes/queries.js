@@ -74,13 +74,105 @@ router.post('/queryonep2', async (req, res, next) => {
     }
     
     statement = `SELECT Year, GenreType, Total FROM(` + statement + `) WHERE ${where_clause} ORDER BY GenreType ASC, YEAR ASC`;
+
+    const result = await query(statement);
     
     for(let i= 0; i < years.length; i++){
         years[i] = years[i].toString();
     }
-    const result = await query(statement);    
+    
+    let genreData = {
+        labels: years,
+        datasets: []
+    };
 
-    res.render('queryone.ejs', {pagetitle: "Flix - Query One", years: years, data: result, genres: final_genres, second_query: true}); 
+    let chartOptions = {
+        legend: {
+            display: true,
+            position: 'top',
+            labels: {
+                boxWidth: 80,
+            }
+        },
+        scales: {
+        }
+    };
+    
+    let dataGenre1 = {
+        label: "",
+        data: [],
+        lineTension: 0,
+        fill: false,
+        borderColor: 'rgba(54, 162, 235, 1)'
+    };    
+    
+    let dataGenre2 = {
+        label:"",
+        data: [],
+        lineTension: 0,
+        fill: false,
+        borderColor: 'rgba(255, 99, 132, 1)'
+    };
+    
+    let dataGenre3 = {
+        label:"",
+        data: [],
+        lineTension: 0,
+        fill: false,
+        borderColor: 'rgba(38, 166, 154, 1)'
+    };
+    
+    let dataGenre4 = {
+        label:"",
+        data: [],
+        lineTension: 0,
+        fill: false,
+        borderColor: 'rgba(142, 36, 170, 1)'
+    };
+    
+    let dataGenre5 = {
+        label:"",
+        data: [],
+        lineTension: 0,
+        fill: false,
+        borderColor: 'rgba(46, 42, 93, 1)'
+    };
+
+    for(const genre of final_genres){
+
+        if(dataGenre1.label == ""){
+            dataGenre1.label = genre;
+        }
+        else if(dataGenre2.label == ""){
+            dataGenre2.label = genre;
+        }
+        else if(dataGenre3.label == ""){
+            dataGenre3.label = genre;
+        }
+        else if(dataGenre4.label == ""){
+            dataGenre4.label = genre;
+        }
+        else if(dataGenre5.label == ""){
+            dataGenre5.label = genre;
+        }
+    }
+
+    let data_Genres = [dataGenre1, dataGenre2, dataGenre3, dataGenre4, dataGenre5];
+            
+    for(let i=0; i < final_genres.length; i++){
+            
+        for(let j=0; j < years.length; j++){ 
+                
+            multiple = years.length;
+            data_Genres[i].data.push(result[(i*multiple)+j][2]);
+        }
+    }   
+        
+    for(let i=0; i < final_genres.length; i++){
+        genreData.datasets.push(data_Genres[i]);
+    }
+
+    res.render('queryone.ejs', {pagetitle: "Flix - Query One", chartOptions: chartOptions, data: genreData, second_query: true}); 
 });
 
 router.get('/querytwo', async (req, res, next) => {

@@ -59,9 +59,7 @@
                 if(status == 'true'){
                     result_array = '<%- JSON.stringify(data)%>'
                     result_array = JSON.parse(result_array);
-                }
-
-                console.log(result_array);
+                }             
 
     
                 for(let i=0; i < result_array.length; i++){
@@ -167,126 +165,30 @@
     </div>
     <script>
     
-            //Second Graph Information
-    let dataGenre1 = {
-    label: "",
-    data: [],
-    lineTension: 0,
-    fill: false,
-    borderColor: 'rgba(54, 162, 235, 1)'
-    };    
-
-    let dataGenre2 = {
-    label:"",
-    data: [],
-    lineTension: 0,
-    fill: false,
-    borderColor: 'rgba(255, 99, 132, 1)'
-    };
-
-    let dataGenre3 = {
-    label:"",
-    data: [],
-    lineTension: 0,
-    fill: false,
-    borderColor: 'rgba(38, 166, 154, 1)'
-    };
-
-    let dataGenre4 = {
-    label:"",
-    data: [],
-    lineTension: 0,
-    fill: false,
-    borderColor: 'rgba(142, 36, 170, 1)'
-    };
-
-    let dataGenre5 = {
-    label:"",
-    data: [],
-    lineTension: 0,
-    fill: false,
-    borderColor: 'rgba(46, 42, 93, 1)'
-    };
-
-    
+            //Second Graph Information    
 
             let status2 = '<%= (typeof(second_query) == "undefined") ? '' : second_query %>';
             
-            let result_array2;
-            let genres_array;
-            let years_array;
-            
+            let genreData;
+            let chartOptions;                      
 
             if(status2 == 'true'){
-                result_array2 = '<%- JSON.stringify(data)%>'
-                result_array2 = JSON.parse(result_array2);
-                genres_array = '<%- JSON.stringify(genres)%>'
-                genres_array = JSON.parse(genres_array);
-                years_array = '<%- JSON.stringify(years)%>'
-                years_array = JSON.parse(years_array);
-            }            
 
-            for( const genre of genres_array){
+                //Chart Data
+                genreData = '<%- JSON.stringify(data)%>'
+                genreData = JSON.parse(genreData);
+                
+                //Chart Options
+                chartOptions = '<%- JSON.stringify(chartOptions)%>'
+                chartOptions = JSON.parse(chartOptions);
+            }           
 
-                if(dataGenre1.label == ""){
-                    dataGenre1.label = genre;
-                }
-                else if(dataGenre2.label == ""){
-                    dataGenre2.label = genre;
-                }
-                else if(dataGenre3.label == ""){
-                    dataGenre3.label = genre;
-                }
-                else if(dataGenre4.label == ""){
-                    dataGenre4.label = genre;
-                }
-                else if(dataGenre5.label == ""){
-                    dataGenre5.label = genre;
-                }
-            }
-            
-            let genreData = {
-    labels: years_array,
-    datasets: []
-    };
-    
-            let data_Genres = [dataGenre1, dataGenre2, dataGenre3, dataGenre4, dataGenre5];
-            
-            for(let i=0; i < genres_array.length; i++){
-
-                console.log(years_array.length);
-                for(let j=0; j < years_array.length; j++){ 
-                    
-                    multiple = years_array.length;
-                    data_Genres[i].data.push(result_array2[(i*multiple)+j][2]);
-                }
-            }
-
-            for(let i=0; i < genres_array.length; i++){
-                genreData.datasets.push(data_Genres[i]);
-            }
-       
-    console.log(data_Genres[1].data);
-    
-    
-    let chartOptions = {
-        legend: {
-            display: true,
-            position: 'top',
-            labels: {
-                boxWidth: 80,
-            }
-        },
-        scales: {
-        }
-    };
-
-    let genreCanvas = document.getElementById("line-chart");
-    let lineChart = new Chart(genreCanvas, {
-        type: 'line',
-        data: genreData,
-        options: chartOptions
-    }); 
+            let genreCanvas = document.getElementById("line-chart");
+            let lineChart = new Chart(genreCanvas, {
+                type: 'line',
+                data: genreData,
+                options: chartOptions
+            }); 
     </script>
     <% } %>
     <br>  
