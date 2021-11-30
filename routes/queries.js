@@ -45,7 +45,7 @@ router.post('/queryonep2', async (req, res, next) => {
 
         final_genres.push(genres[i]);
         
-        if(i == 5 | i == (genres.length-1)){
+        if(i == 5 || i == (genres.length-1)){
             where_clause += `GenreType = '${genres[i]}'`;
             break;            
         }
@@ -59,18 +59,14 @@ router.post('/queryonep2', async (req, res, next) => {
     for(let i=from_year; i <= to_year; i++){
 
         years.push(i);
-        
-        if(i == to_year){            
-            statement += `SELECT Year, GenreType, COUNT(GenreType)/(SELECT COUNT(GenreType) FROM Genre JOIN Movie ON Genre.MovieID = Movie.ID WHERE Year = ${i})*100 AS Total 
-            FROM Genre JOIN Movie on Movie.ID = Genre.MovieID WHERE Year = ${i}
-            GROUP BY GenreType, Year`;
-        }
-        else{            
-            statement += `SELECT Year, GenreType, COUNT(GenreType)/(SELECT COUNT(GenreType) FROM Genre JOIN Movie ON Genre.MovieID = Movie.ID WHERE Year = ${i})*100 AS Total 
+
+        statement += `SELECT Year, GenreType, COUNT(GenreType)/(SELECT COUNT(GenreType) FROM Genre JOIN Movie ON Genre.MovieID = Movie.ID WHERE Year = ${i})*100 AS Total 
                 FROM Genre JOIN Movie on Movie.ID = Genre.MovieID WHERE Year = ${i} 
                 GROUP BY GenreType, Year`;
+
+        if(i != to_year){
             statement += ` UNION `;
-        }   
+        }          
     }
     
     statement = `SELECT Year, GenreType, Total FROM(` + statement + `) WHERE ${where_clause} ORDER BY GenreType ASC, YEAR ASC`;
@@ -95,6 +91,15 @@ router.post('/queryonep2', async (req, res, next) => {
             }
         },
         scales: {
+        },
+        plugins: {
+            title: {
+                display: true,
+                font: {
+                    size: 22
+                },
+                text: `Percentage of Movie Genres From ${years[0]} to ${years[years.length-1]}`
+            }
         }
     };
     
@@ -103,7 +108,8 @@ router.post('/queryonep2', async (req, res, next) => {
         data: [],
         lineTension: 0,
         fill: false,
-        borderColor: 'rgba(54, 162, 235, 1)'
+        borderColor: 'rgba(54, 162, 235, 1)',
+        backgroundColor: 'rgba(54, 162, 235, 1)'
     };    
     
     let dataGenre2 = {
@@ -111,7 +117,8 @@ router.post('/queryonep2', async (req, res, next) => {
         data: [],
         lineTension: 0,
         fill: false,
-        borderColor: 'rgba(255, 99, 132, 1)'
+        borderColor: 'rgba(255, 99, 132, 1)',
+        backgroundColor: 'rgba(255, 99, 132, 1)'
     };
     
     let dataGenre3 = {
@@ -119,7 +126,8 @@ router.post('/queryonep2', async (req, res, next) => {
         data: [],
         lineTension: 0,
         fill: false,
-        borderColor: 'rgba(38, 166, 154, 1)'
+        borderColor: 'rgba(38, 166, 154, 1)',
+        backgroundColor: 'rgba(38, 166, 154, 1)'
     };
     
     let dataGenre4 = {
@@ -127,7 +135,8 @@ router.post('/queryonep2', async (req, res, next) => {
         data: [],
         lineTension: 0,
         fill: false,
-        borderColor: 'rgba(142, 36, 170, 1)'
+        borderColor: 'rgba(142, 36, 170, 1)',
+        backgroundColor: 'rgba(142, 36, 170, 1)'
     };
     
     let dataGenre5 = {
@@ -135,7 +144,8 @@ router.post('/queryonep2', async (req, res, next) => {
         data: [],
         lineTension: 0,
         fill: false,
-        borderColor: 'rgba(46, 42, 93, 1)'
+        borderColor: 'rgba(46, 42, 93, 1)',
+        backgroundColor: 'rgba(46, 42, 93, 1)'
     };
 
     for(const genre of final_genres){
