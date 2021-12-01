@@ -7,8 +7,6 @@ const router = express.Router();
 
 router.get('/', async (req, res, next) => {
 
-    //value and year are zero due to initial loading of the graph
-    //Can figure that out later
     const statement = `SELECT COUNT(ID) FROM Movie`;
     const result = await query(statement);
 
@@ -17,12 +15,24 @@ router.get('/', async (req, res, next) => {
 
 router.post('/', async (req, res, next) => {
     
-    //Need error checking, most likely client side
-    const input_year = req.body.year;
-    const statement = `SELECT AVG(Runtime) FROM Movie WHERE Year = ${input_year}`;
-    const result = await query(statement);
     
-    res.render('index.ejs', {pagetitle: "Result", year: input_year , value: result[0][0]});
+    const statement = `SELECT SUM(Total) FROM (
+        SELECT COUNT(MovieID) AS Total FROM Actor
+        UNION ALL SELECT COUNT(MovieID) FROM Awards
+        UNION ALL SELECT COUNT(MovieID) FROM BoxOffice
+        UNION ALL SELECT COUNT(MovieID) FROM CriticRatings
+        UNION ALL SELECT COUNT(MovieID) FROM Director
+        UNION ALL SELECT COUNT(MovieID) FROM Genre
+        UNION ALL SELECT COUNT(ID) FROM Movie
+        UNION ALL SELECT COUNT(MovieID) FROM MovieLanguages
+        UNION ALL SELECT COUNT(MovieID) FROM ReleasedIn
+    )`;
+    const result = await query(statement);
+
+    const statement2 = `SELECT COUNT(ID) FROM Movie`;
+    const result2 = await query(statement2);
+    
+    res.render('index.ejs', {pagetitle: "Flix", total: result, movies: result2, hidden: 'block'});
 });
 
 module.exports = router;

@@ -14,6 +14,19 @@
           <div class="container">
             <p>Our motivation to create a Movie Web app serves to not only join our joint passion for movies but to describe movie review data in a trend analysis manner. We plan on addressing the best films to watch through queries detailed out in our Reviews Section. We hope you enjoy our website</p>
           </div>
+          <div class="container">
+            <div class="row center-align">
+              <form action="/" method="POST">
+                <button class="btn purple darken-1" type="submit">Get Total Records</button>
+              </form>
+            </div>
+            <div class="row center-align">
+              
+                <p style="font-size:18px; display:<%= (typeof(hidden) == "undefined") ? 'none' : hidden %>">Total Records:  <%= (typeof(total) == "undefined") ? '' : total %></p>                
+              
+            </div>
+          </div>
+            
     </div>   
   </main>
 <%- include('./includes/end.ejs') %>
