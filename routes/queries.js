@@ -31,9 +31,20 @@ router.post('/queryone', async (req, res, next) => {
 
 router.post('/queryonep2', async (req, res, next) => {
     
-    const from_year = req.body.fromyear;
-    const to_year = req.body.toyear;
+    let from_year = req.body.fromyear;
+    let to_year = req.body.toyear;
     const genres = req.body.genres;
+    
+    if(from_year < 1970){
+        from_year = 1970;
+    }
+    else if(to_year > 2020){
+        to_year = 2020;
+    }
+    else if(to_year == from_year){
+        to_year = parseInt(to_year);
+        to_year += 1;
+    }
     
     let years = [];    
 
@@ -45,7 +56,7 @@ router.post('/queryonep2', async (req, res, next) => {
 
         final_genres.push(genres[i]);
         
-        if(i == 5 || i == (genres.length-1)){
+        if(i == 4 || i == (genres.length-1)){
             where_clause += `GenreType = '${genres[i]}'`;
             break;            
         }
@@ -187,6 +198,74 @@ router.post('/queryonep2', async (req, res, next) => {
 
 router.get('/querytwo', async (req, res, next) => {
     res.render('querytwo.ejs', {pagetitle: "Flix - Query Two"}); 
+});
+
+router.post('/querytwo', async (req, res, next) => {
+
+    const input_year = req.body.year;
+
+    let statement = ``;
+
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    for(let i=0; i < 12; i++){
+        
+        statement += `SELECT Month, SUM(Earnings) AS "Month Earnings" FROM (SELECT SUBSTR(Released, 4, 3) AS Month, Earnings, Year FROM Movie JOIN BoxOffice ON Movie.ID = BoxOffice.MovieID
+                WHERE Released LIKE '%${months[i]}%' AND Year = ${input_year}) GROUP BY Month, Year`;
+
+        if(i != months.length-1){
+            statement += ` UNION `;
+        }        
+    }
+
+    const result = await query(statement);    
+
+    // let monthslabels = [];       
+
+    let monthlyData = {
+        data: [],
+        backgroundColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)', 'rgba(38, 166, 154, 1)', 'rgba(142, 36, 170, 1)', 'rgba(46, 42, 93, 1)', 'rgba(2,55,136,1)', 'rgba(255,108,17,1)', 'rgba(45,226,230,1)', 'rgba(93, 164, 166,1)','rgba(140,30,255,1)', 'rgba(19,71,125,1)', 'rgba(243,206,117,1)'],
+        hoverOffset: 5
+    }
+
+    for(let i=0; i < 12; i++){
+
+        for(let j=0; j < 12; j++){
+            if(result[j][0] == months[i]){
+                monthlyData.data.push(result[j][1]);
+            }
+        }        
+    }    
+
+    let pieData = {
+        labels:months,
+        datasets: [monthlyData],
+    };
+    
+    let chartOptions = {
+        legend: {
+            display: true,
+            position: 'top',
+            labels: {
+                boxWidth: 80,
+            }
+        },
+        scales: {
+        },
+        plugins: {
+            title: {
+                display: true,
+                font: {
+                    size: 22
+                },
+                text: `Total Movie Earnings Per Month From ${input_year}`
+            }
+        },
+        responsive: false,
+    }; 
+    
+    
+    res.render('querytwo.ejs', {pagetitle: "Flix - Query Two", data: pieData, chartOptions: chartOptions, first_query: true}); 
 });
 
 router.get('/querythree', (req, res, next) => {

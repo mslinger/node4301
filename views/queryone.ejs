@@ -3,7 +3,8 @@
 //For Multiple Select
     document.addEventListener('DOMContentLoaded', function() {
         var instances = M.AutoInit();
-});</script>
+});
+</script>
 </head>
 <body>
     <%- include('./includes/nav.ejs') %>
@@ -117,7 +118,7 @@
                         <label for="year">To Year</label>
                         <input class="validate" type="number" name="toyear" min="1970" max="2020" required>                        
                     </div>
-                    <select multiple id="option-select" name="genres"required>
+                    <select multiple id="option-select" name="genres" required>
                         <option value="" disabled selected>Choose your option</option>
                         <option value="Action">Action</option>
                         <option value="Adult">Adult</option>

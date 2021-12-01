@@ -9,5 +9,60 @@
             <p>This query aims to highlight the commercial success of academy award winning films with that of non-awarded films. This visualization can be done across multiple years that will be highlighted in a line graph, while when selecting a single year a box plot would easily be able to populate the information clearly for the end user.</p>
         </div>
     </div>
+    <div class="container">
+        <div class="row">
+            <div class="col m6 offset-m3">
+            <div class="card grey lighten-4 z-depth-2">
+                <div class="card-content pink-text darken-3">
+                    <span class="card-title">Earnings Per Month Per Year</span>
+                    <form action="/querytwo" method="POST">
+                    <div class="input field">
+                        <label for="year">Year</label>
+                        <input class="validate" type="number" name="year" min="1970" max="2020" required>                        
+                    </div>                    
+                    <br>
+                    <button class="btn purple darken-1" type="submit">Submit</button>
+                    </form>                    
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col l12 offset-l2 m10 offset-m1">
+                <% if((typeof(first_query) == "undefined") ? '' : first_query) { %>             
+                <canvas id="pie-chart" width="750" height="750"></canvas>
+            </div>
+        </div>
+    </div>
+    <script>
+    
+            //Second Graph Information    
 
+            let status2 = '<%= (typeof(first_query) == "undefined") ? '' : first_query %>';
+            
+            let monthlyData;
+            let chartOptions;                      
+
+            if(status2 == 'true'){
+
+                //Chart Data
+                monthlyData = '<%- JSON.stringify(data)%>'
+                monthlyData= JSON.parse(monthlyData);
+                
+                //Chart Options
+                chartOptions = '<%- JSON.stringify(chartOptions)%>'
+                chartOptions = JSON.parse(chartOptions);
+            }            
+
+            let monthlyCanvas = document.getElementById("pie-chart");
+            let pieChart = new Chart(monthlyCanvas, {
+                type: 'pie',
+                data: monthlyData,
+                options: chartOptions
+            }); 
+    </script>
+    <% } %>
+    <br>
 <%- include('./includes/end.ejs') %>
