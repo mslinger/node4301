@@ -179,13 +179,17 @@ router.post('/queryonep2', async (req, res, next) => {
     }
 
     let data_Genres = [dataGenre1, dataGenre2, dataGenre3, dataGenre4, dataGenre5];
-            
+    
+
+    //Need to account for genres lacking total yearly range
+
     for(let i=0; i < final_genres.length; i++){
             
-        for(let j=0; j < years.length; j++){ 
-                
-            multiple = years.length;
+        for(let j=0; j < years.length; j++){
+
+            multiple = years.length; 
             data_Genres[i].data.push(result[(i*multiple)+j][2]);
+          
         }
     }   
         
@@ -270,6 +274,136 @@ router.post('/querytwo', async (req, res, next) => {
 
 router.get('/querythree', (req, res, next) => {
     res.render('querythree.ejs', {pagetitle: "Flix - Query Three"}); 
+});
+
+router.post('/querythree', async (req, res, next) => {
+
+    let from_year = req.body.fromyear;
+    let to_year = req.body.toyear;    
+
+    let statement = `SELECT FullName, SUM(Oscars) FROM (
+        SELECT FullName, Oscars, Year FROM Movie JOIN Actor ON Movie.ID = Actor.MovieID JOIN Awards ON Movie.ID = Awards.MovieID WHERE Oscars IS NOT NULL)
+        WHERE Year BETWEEN ${from_year} AND ${to_year}
+        GROUP BY FullName, Oscars
+        ORDER BY OSCARS DESC`;
+
+    
+    statement = `SELECT * FROM (` + statement + `) WHERE ROWNUM < 11`;
+
+    const result = await query(statement);   
+
+    let chartOptions = {
+        indexAxis: 'y',
+        elements: {
+            bar: {
+              borderWidth: 2,
+            }
+        },
+        scales: {
+            y:{
+                beginAtZero: true,                
+            }
+        },        
+        plugins: {
+            legend: {
+              position: 'top',
+            },
+            title: {
+                display: true,
+                text: `Actors That Worked on Most Awarded Oscar Films from ${from_year} to ${to_year}`,
+                font: {
+                    size: 22
+                }
+            }
+        },
+        responsive: true,        
+    };
+
+    let ActorData = {
+        labels: [],
+        datasets: []
+    };
+    
+    let data = {        
+        label: "Number of Oscars",
+        data: [],
+        borderColor: ['rgba(142, 36, 170, 1)'], 
+        backgroundColor: ['rgba(38, 166, 154, .65)']              
+    };
+
+    for(let i=0; i < result.length; i++ ){        
+        ActorData.labels.push(result[i][0]);
+        data.data.push(result[i][1]);
+    }
+
+    ActorData.datasets.push(data);
+
+    res.render('querythree.ejs', {pagetitle: "Flix - Query Three", first_query: true, data: ActorData, chartOptions: chartOptions}); 
+});
+
+router.post('/querythreep2', async (req, res, next) => {
+
+    let from_year = req.body.fromyear;
+    let to_year = req.body.toyear;    
+
+    let statement = `SELECT FullName, SUM(Oscars) FROM (
+        SELECT FullName, Oscars, Year FROM Movie JOIN Director ON Movie.ID = Director.MovieID JOIN Awards ON Movie.ID = Awards.MovieID WHERE Oscars IS NOT NULL)
+        WHERE Year BETWEEN ${from_year} AND ${to_year}
+        GROUP BY FullName, Oscars
+        ORDER BY OSCARS DESC`;
+
+    
+    statement = `SELECT * FROM (` + statement + `) WHERE ROWNUM < 11`;
+
+    const result = await query(statement);   
+
+    let chartOptions = {
+        indexAxis: 'y',
+        elements: {
+            bar: {
+              borderWidth: 2,
+            }
+        },
+        scales: {
+            y:{
+                beginAtZero: true,                
+            }
+        },        
+        plugins: {
+            legend: {
+              position: 'top',
+            },
+            title: {
+                display: true,
+                text: `Directors That Worked on Most Awarded Oscar Films from ${from_year} to ${to_year}`,
+                font: {
+                    size: 22
+                }
+            }
+        },
+        responsive: true,        
+    };
+
+    let DirectorData = {
+        labels: [],
+        datasets: []
+    };
+    
+    let data = {        
+        label: "Number of Oscars",
+        data: [],
+        borderColor: ['rgba(142, 36, 170, 1)'], 
+        backgroundColor: ['rgba(38, 166, 154, .65)']              
+    };
+
+    for(let i=0; i < result.length; i++ ){        
+        DirectorData.labels.push(result[i][0]);
+        data.data.push(result[i][1]);
+    }
+
+    DirectorData.datasets.push(data);
+
+    res.render('querythree.ejs', {pagetitle: "Flix - Query Three", second_query: true, data: DirectorData, chartOptions: chartOptions}); 
 });
 
 router.get('/queryfour', (req, res, next) => {

@@ -9,5 +9,120 @@
             <p>This query aims to give a simple comprehensive view to the end user that allows for a quick look back at a year's most enjoyed films based on user reviews.</p>
         </div>
     </div>
+    <div class="container">
+        <div class="row">
+            <div class="col m6 offset-m3">
+            <div class="card grey lighten-4 z-depth-2">
+                <div class="card-content pink-text darken-3">
+                    <span class="card-title">Actors that worked on Most Oscar Awarded Films</span>
+                    <form action="/querythree" method="POST">
+                    <div class="input field">
+                        <label for="year">From Year</label>
+                        <input class="validate" type="number" name="fromyear" min="1970" max="2020" required>                        
+                    </div>
+                    <div class="input field">
+                        <label for="year">To Year</label>
+                        <input class="validate" type="number" name="toyear" min="1970" max="2020" required>                        
+                    </div>          
+                     
+                    <button class="btn purple darken-1" type="submit">Submit</button>
+                    </form>                    
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <% if((typeof(first_query) == "undefined") ? '' : first_query) { %>           
+            <canvas id="barChart" width="900" height="500"></canvas>
+            
+            <script>
+                let status = '<%= (typeof(first_query) == "undefined") ? '' : first_query %>';
+                            
+                let ActorData;
+                let chartOptions;                      
+
+                if(status == 'true'){
+
+                    //Chart Data
+                    ActorData = '<%- JSON.stringify(data)%>'
+                    ActorData = JSON.parse(ActorData);
+                
+                    //Chart Options
+                    chartOptions = '<%- JSON.stringify(chartOptions)%>'
+                    chartOptions = JSON.parse(chartOptions);
+                } 
+    
+                const ctx = document.getElementById('barChart').getContext('2d');
+                const myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: ActorData,
+                    options: chartOptions,
+                });
+            </script>
+            <% } %>            
+        </div>
+    </div>
+    <br>
+    <br>
+    <div class="container">
+        <div class="row">
+            <div class="col m6 offset-m3">
+            <div class="card grey lighten-4 z-depth-2">
+                <div class="card-content pink-text darken-3">
+                    <span class="card-title">Directors that worked on Most Oscar Awarded Films</span>
+                    <form action="/querythreep2" method="POST">
+                    <div class="input field">
+                        <label for="year">From Year</label>
+                        <input class="validate" type="number" name="fromyear" min="1970" max="2020" required>                        
+                    </div>
+                    <div class="input field">
+                        <label for="year">To Year</label>
+                        <input class="validate" type="number" name="toyear" min="1970" max="2020" required>                        
+                    </div>          
+                     
+                    <button class="btn purple darken-1" type="submit">Submit</button>
+                    </form>                    
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <% if((typeof(second_query) == "undefined") ? '' : second_query) { %>           
+            <canvas id="barChart" width="900" height="500"></canvas>
+            
+            <script>
+                let status = '<%= (typeof(second_query) == "undefined") ? '' : second_query %>';
+                            
+                let DirectorData;
+                let chartOptions;                      
+
+                if(status == 'true'){
+
+                    //Chart Data
+                    DirectorData = '<%- JSON.stringify(data)%>'
+                    DirectorData = JSON.parse(ActorData);
+                
+                    //Chart Options
+                    chartOptions = '<%- JSON.stringify(chartOptions)%>'
+                    chartOptions = JSON.parse(chartOptions);
+                } 
+    
+                const ctx = document.getElementById('barChart').getContext('2d');
+                const myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: DirectorData,
+                    options: chartOptions,
+                });
+            </script>
+            <% } %>            
+        </div>
+    </div>
+    <br>
+    <br>
+        
 
 <%- include('./includes/end.ejs') %>
