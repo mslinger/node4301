@@ -13,16 +13,18 @@ router.post('/queryone', async (req, res, next) => {
     const input_year = req.body.year;
     const desc = req.body.descending;
     const asc = req.body.ascending;
-    let statement;
+
+    let statement = `SELECT GenreType, COUNT(GenreType) as Total FROM (SELECT GenreType FROM Movie JOIN Genre on Movie.ID = Genre.MovieID WHERE Year = ${input_year}) GROUP BY GenreType`;
+
 
     if(asc == "on" && desc === undefined){
-        statement = `SELECT GenreType, COUNT(GenreType) as Total FROM (SELECT GenreType FROM Movie JOIN Genre on Movie.ID = Genre.MovieID WHERE Year = ${input_year}) GROUP BY GenreType ORDER BY Total ASC`;
+         statement += ` ORDER BY Total ASC`;
     }
     else if(desc == "on" && asc === undefined){
-        statement = `SELECT GenreType, COUNT(GenreType) as Total FROM (SELECT GenreType FROM Movie JOIN Genre on Movie.ID = Genre.MovieID WHERE Year = ${input_year}) GROUP BY GenreType ORDER BY Total DESC`;
+        statement += ` ORDER BY Total DESC`;
     }
     else{
-        statement = `SELECT GenreType, COUNT(GenreType) FROM (SELECT GenreType FROM Movie JOIN Genre on Movie.ID = Genre.MovieID WHERE Year = ${input_year}) GROUP BY GenreType`;
+        statement += ` ORDER BY GenreType ASC`;
     }
     const result = await query(statement);
 
@@ -391,7 +393,7 @@ router.post('/querythreep2', async (req, res, next) => {
         indexAxis: 'y',
         elements: {
             bar: {
-              borderWidth: 2,
+              borderWidth: 1,
             }
         },
         scales: {
