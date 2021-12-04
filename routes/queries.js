@@ -102,6 +102,9 @@ router.post('/queryonep2', async (req, res, next) => {
             }
         },
         scales: {
+            y: {
+                min: 0
+            }
         },
         plugins: {
             title: {
@@ -177,20 +180,47 @@ router.post('/queryonep2', async (req, res, next) => {
             dataGenre5.label = genre;
         }
     }
-
-    let data_Genres = [dataGenre1, dataGenre2, dataGenre3, dataGenre4, dataGenre5];
     
+    let data_Genres = [dataGenre1, dataGenre2, dataGenre3, dataGenre4, dataGenre5];
 
-    //Need to account for genres lacking total yearly range
+    //fill DataGenres data with zeros [0,0,...,0]
+    for(let i= 0; i < data_Genres.length; i++){
+        
+        for(let j=0; j < years.length; j++){
+            data_Genres[i].data.push(0);
+        }
+    }
 
+    let dataGenres_length = [];
+
+    //Get length of each genre
+    for(let j=0; j < data_Genres.length; j++){
+        
+        let count = 0;
+        for(let i=0; i < result.length; i++){
+
+            if(data_Genres[j].label == result[i][1]){
+                count += 1;
+            }
+        }
+        if(count > 0){
+            dataGenres_length.push(count);
+        }
+    }
+    
+    let index_jump = 0;
     for(let i=0; i < final_genres.length; i++){
             
-        for(let j=0; j < years.length; j++){
+        multiple = index_jump;        
+        for(let j=0; j < dataGenres_length[i]; j++){
 
-            multiple = years.length; 
-            data_Genres[i].data.push(result[(i*multiple)+j][2]);
-          
+            //Gets year, subtracts base year to set index for data
+            //e.g., 1991-1970 = 21
+            result_genre_year = parseInt(result[(i*multiple)+j][0]);
+            target_index = result_genre_year - from_year;
+            data_Genres[i].data[target_index] = result[(i*multiple)+j][2];     
         }
+        index_jump = dataGenres_length[i];
     }   
         
     for(let i=0; i < final_genres.length; i++){
