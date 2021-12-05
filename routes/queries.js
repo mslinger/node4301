@@ -28,7 +28,53 @@ router.post('/queryone', async (req, res, next) => {
     }
     const result = await query(statement);
 
-    res.render('queryone.ejs', {pagetitle: "Flix - Query One", year: input_year, data: result, first_query: true}); 
+    let data_labels = [];
+    let data_values = [];
+
+    for(let i=0; i < result.length; i++){
+
+        if(result[i][0] != null){
+            data_labels.push(result[i][0]);
+            data_values.push(result[i][1]);
+        }
+    }
+
+    let genreData = {
+        labels: data_labels,
+        datasets: [{
+            label: 'Number of Films',
+            data: data_values,
+            backgroundColor: [
+                'rgba(54, 162, 235, 0.65)',
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)'
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    let chartOptions = {
+        options: {
+            scales: {
+                y:{
+                    beginAtZero: true
+                }
+            },
+            responsive: true
+        },
+        plugins: {
+            title: {
+                display: true,
+                font: {
+                    size: 22
+                },
+                text: `Number of Movie Genres From ${input_year}`,
+            }
+        }
+    }
+
+    res.render('queryone.ejs', {pagetitle: "Flix - Query One", data: genreData, chartOptions: chartOptions, first_query: true}); 
 });
 
 router.post('/queryonep2', async (req, res, next) => {
@@ -342,7 +388,7 @@ router.post('/querythree', async (req, res, next) => {
             },
             title: {
                 display: true,
-                text: `Actors That Worked on Most Awarded Oscar Films from ${from_year} to ${to_year}`,
+                text: `Actors That Worked on Most Awarded Oscar Movies from ${from_year} to ${to_year}`,
                 font: {
                     size: 22
                 }
@@ -364,7 +410,7 @@ router.post('/querythree', async (req, res, next) => {
     };
 
     for(let i=0; i < result.length; i++ ){        
-        ActorData.labels.push(result[i][0]);
+        ActorData.labels.push(result[i][0].replace("'", " "));
         data.data.push(result[i][1]);
     }
 
@@ -407,7 +453,7 @@ router.post('/querythreep2', async (req, res, next) => {
             },
             title: {
                 display: true,
-                text: `Directors That Worked on Most Awarded Oscar Films from ${from_year} to ${to_year}`,
+                text: `Directors That Worked on Most Awarded Oscar Movies from ${from_year} to ${to_year}`,
                 font: {
                     size: 22
                 }
@@ -429,7 +475,7 @@ router.post('/querythreep2', async (req, res, next) => {
     };
 
     for(let i=0; i < result.length; i++ ){        
-        DirectorData.labels.push(result[i][0]);
+        DirectorData.labels.push(result[i][0].replace("'", " "));
         data.data.push(result[i][1]);
     }
 

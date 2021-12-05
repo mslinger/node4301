@@ -50,51 +50,27 @@
             <canvas id="barChart" width="900" height="500"></canvas>
             
             <script>
-                let status = '<%= (typeof(first_query) == "undefined") ? '' : first_query %>';
+                let status = '<%= (typeof(first_query) == "undefined") ? '' : first_query %>';                
+            
+                let genreData;
+                let chartOptions;                      
 
-                let result_array;
-                let data_labels = [];
-                let data_values = [];
-                
                 if(status == 'true'){
-                    result_array = '<%- JSON.stringify(data)%>'
-                    result_array = JSON.parse(result_array);
-                }             
 
-    
-                for(let i=0; i < result_array.length; i++){
-    
-                    if(result_array[i][0] != null && result_array[i][1] != 0){
-                        data_labels.push(result_array[i][0]);
-                        data_values.push(result_array[i][1]);
-                    }
+                    //Chart Data
+                    genreData = '<%- JSON.stringify(data)%>'
+                    genreData = JSON.parse(genreData);
+                
+                    //Chart Options
+                    chartOptions = '<%- JSON.stringify(chartOptions)%>'
+                    chartOptions = JSON.parse(chartOptions);
                 }
     
                 const ctx = document.getElementById('barChart').getContext('2d');
                 const myChart = new Chart(ctx, {
                     type: 'bar',
-                    data: {
-                        labels: data_labels,
-                        datasets: [{
-                            label: 'Number of Films',
-                            data: data_values,
-                            backgroundColor: [
-                                'rgba(54, 162, 235, 0.65)',
-                            ],
-                            borderColor: [
-                                'rgba(255, 99, 132, 1)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            y:{
-                                beginAtZero: true
-                            }
-                        },
-                        responsive: true
-                    }
+                    data: genreData,
+                    options: chartOptions,
                 });
             </script>
             <% } %>            
