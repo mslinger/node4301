@@ -123,6 +123,65 @@
     </div>
     <br>
     <br>
+    <div class="container">
+        <div class="row">
+            <div class="col m6 offset-m3">
+            <div class="card grey lighten-4 z-depth-2">
+                <div class="card-content pink-text darken-3">
+                    <span class="card-title">Average Ratings of Critics and Consumers for Oscar Awarded Films </span>
+                    <form action="/querythreep3" method="POST">
+                    <div class="input field">
+                        <label for="year">From Year</label>
+                        <input class="validate" type="number" name="fromyear" min="1970" max="2020" required>                        
+                    </div>
+                    <div class="input field">
+                        <label for="year">To Year</label>
+                        <input class="validate" type="number" name="toyear" min="1970" max="2020" required>                        
+                    </div>          
+                     
+                    <button class="btn purple darken-1" type="submit">Submit</button>
+                    </form>                    
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+    <div class="container">
+        <div class="row">
+            <% if((typeof(third_query) == "undefined") ? '' : third_query) { %>           
+            <canvas id="barChart" width="900" height="500"></canvas>
+            
+            <script>
+                let status = '<%= (typeof(third_query) == "undefined") ? '' : third_query %>';
+                            
+                let RatingsData;
+                let chartOptions;                      
+
+                if(status == 'true'){
+
+                    //Chart Data
+                    RatingsData = '<%- JSON.stringify(data)%>'
+                    RatingsData = JSON.parse(RatingsData);
+                
+                    //Chart Options
+                    chartOptions = '<%- JSON.stringify(chartOptions)%>'
+                    chartOptions = JSON.parse(chartOptions);
+                } 
+    
+                const ctx = document.getElementById('barChart').getContext('2d');
+                const myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: RatingsData,
+                    options: chartOptions,
+                });
+            </script>
+            <% } %>            
+        </div>
+    </div>
+    <br>
+    <br>
         
 
 <%- include('./includes/end.ejs') %>

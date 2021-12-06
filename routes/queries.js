@@ -72,7 +72,7 @@ router.post('/queryone', async (req, res, next) => {
                 text: `Number of Movie Genres From ${input_year}`,
             }
         }
-    }
+    };
 
     res.render('queryone.ejs', {pagetitle: "Flix - Query One", data: genreData, chartOptions: chartOptions, first_query: true}); 
 });
@@ -482,6 +482,98 @@ router.post('/querythreep2', async (req, res, next) => {
     DirectorData.datasets.push(data);
 
     res.render('querythree.ejs', {pagetitle: "Flix - Query Three", second_query: true, data: DirectorData, chartOptions: chartOptions}); 
+});
+
+router.post('/querythreep3', async (req, res, next) => {
+
+    let from_year = req.body.fromyear;
+    let to_year = req.body.toyear;    
+
+    let statement = `SELECT Year, CAST(AVG(MetaScore) AS decimal(5,2)), CAST(AVG(RottenTomatoes) AS decimal(5,2)), CAST(AVG(ImdbAvg)*10 AS decimal(5,2)) 
+    FROM (SELECT * FROM CriticRatings JOIN (SELECT MovieID as ID, Year, ImdbAvg FROM Movie JOIN Awards ON Movie.ID = Awards.MovieID WHERE Oscars > 0) ON CriticRatings.MovieID = ID)
+    GROUP BY Year ORDER BY YEAR ASC`
+    
+    statement = `SELECT * FROM (` + statement + `) WHERE Year BETWEEN ${from_year} AND ${to_year}`;
+
+    const result = await query(statement);
+    
+    console.log(result);
+
+    let chartOptions = {
+        options: {
+            scales: {
+                y:{
+                    beginAtZero: true
+                }
+            },
+            responsive: true
+        },
+        plugins: {
+            title: {
+                display: true,
+                font: {
+                    size: 22
+                },
+                text: `Average Consumer and Critic Ratings of Oscar Awarded Films from ${from_year} to ${to_year}`,
+            }
+        }
+    };
+
+    let RatingsData = {
+        labels: [],
+        datasets: []
+    };
+    
+    let data = {        
+        label: "Number of Oscars",
+        data: [],
+        borderColor: ['rgba(142, 36, 170, 1)'], 
+        backgroundColor: ['rgba(38, 166, 154, .65)']              
+    };
+    
+    let RottenTomatoes = {
+        label: "RottenTomaotes",
+        data: [],
+        lineTension: 0,
+        fill: false,
+        borderColor: 'rgba(54, 162, 235, 1)',
+        backgroundColor: 'rgba(54, 162, 235, 1)'
+    };    
+    
+    let MetaScore = {
+        label:"MetaScore",
+        data: [],
+        lineTension: 0,
+        fill: false,
+        borderColor: 'rgba(255, 99, 132, 1)',
+        backgroundColor: 'rgba(255, 99, 132, 1)'
+    };
+    
+    let ImdbAvg = {
+        label:"Imdb",
+        data: [],
+        lineTension: 0,
+        fill: false,
+        borderColor: 'rgba(38, 166, 154, 1)',
+        backgroundColor: 'rgba(38, 166, 154, 1)'
+    };
+
+    //load years into labels
+    for(let i=from_year; i < to_year; i++){
+        RatingsData.labels.push(i);        
+    }
+
+    //load data into respect objects
+    for(let i=0; i < result.length; i++){
+        RottenTomatoes.data.push(result[i][2]);
+        MetaScore.data.push(result[i][1]);
+        ImdbAvg.data.push(result[i][3]);
+    }
+
+    RatingsData.datasets = [MetaScore, RottenTomatoes, ImdbAvg];
+    
+
+    res.render('querythree.ejs', {pagetitle: "Flix - Query Three", third_query: true, data: RatingsData, chartOptions: chartOptions}); 
 });
 
 router.get('/queryfour', (req, res, next) => {
