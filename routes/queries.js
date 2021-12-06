@@ -8,14 +8,14 @@ router.get('/queryone', (req, res, next) => {
     res.render('queryone.ejs', {pagetitle: "Flix - Query One", data: 0, year: 0}); 
 });
 
+//Genre per year
 router.post('/queryone', async (req, res, next) => {
     
-    const input_year = req.body.year;
+    let input_year = req.body.year;
     const desc = req.body.descending;
-    const asc = req.body.ascending;
+    const asc = req.body.ascending;   
 
     let statement = `SELECT GenreType, COUNT(GenreType) as Total FROM (SELECT GenreType FROM Movie JOIN Genre on Movie.ID = Genre.MovieID WHERE Year = ${input_year}) GROUP BY GenreType`;
-
 
     if(asc == "on" && desc === undefined){
          statement += ` ORDER BY Total ASC`;
@@ -77,6 +77,7 @@ router.post('/queryone', async (req, res, next) => {
     res.render('queryone.ejs', {pagetitle: "Flix - Query One", data: genreData, chartOptions: chartOptions, first_query: true}); 
 });
 
+//Genre percentage over years
 router.post('/queryonep2', async (req, res, next) => {
     
     let from_year = req.body.fromyear;
@@ -282,31 +283,23 @@ router.get('/querytwo', async (req, res, next) => {
     res.render('querytwo.ejs', {pagetitle: "Flix - Query Two"}); 
 });
 
+//Earnings per month
 router.post('/querytwo', async (req, res, next) => {
 
     const input_year = req.body.year;
 
     let statement = ``;
 
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-    for(let i=0; i < 12; i++){
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];    
         
-        statement += `SELECT Month, SUM(Earnings) AS "Month Earnings" FROM (SELECT SUBSTR(Released, 4, 3) AS Month, Earnings, Year FROM Movie JOIN BoxOffice ON Movie.ID = BoxOffice.MovieID
-                WHERE Released LIKE '%${months[i]}%' AND Year = ${input_year}) GROUP BY Month, Year`;
+    statement += `SELECT Month, SUM(Earnings) AS "Month Earnings" FROM (SELECT SUBSTR(Released, 4, 3) AS Month, Earnings, Year FROM Movie JOIN BoxOffice ON Movie.ID = BoxOffice.MovieID)
+        WHERE Year = ${input_year} AND Month IS NOT NULL GROUP BY Month`;    
 
-        if(i != months.length-1){
-            statement += ` UNION `;
-        }        
-    }
-
-    const result = await query(statement);    
-
-    // let monthslabels = [];       
+    const result = await query(statement);        
 
     let monthlyData = {
         data: [],
-        backgroundColor: ['rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)', 'rgba(38, 166, 154, 1)', 'rgba(142, 36, 170, 1)', 'rgba(46, 42, 93, 1)', 'rgba(2,55,136,1)', 'rgba(255,108,17,1)', 'rgba(45,226,230,1)', 'rgba(93, 164, 166,1)','rgba(140,30,255,1)', 'rgba(19,71,125,1)', 'rgba(243,206,117,1)'],
+        backgroundColor: ['rgba(54, 81, 235,1)','rgba(54, 81, 200,1)','rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)', 'rgba(38, 166, 154, 1)', 'rgba(142, 36, 170, 1)', 'rgba(46, 42, 93, 1)', 'rgba(2,55,136,1)', 'rgba(255,108,17,1)', 'rgba(45,226,230,1)', 'rgba(93, 164, 166,1)','rgba(140,30,255,1)'],
         hoverOffset: 5
     }
 
@@ -354,6 +347,7 @@ router.get('/querythree', (req, res, next) => {
     res.render('querythree.ejs', {pagetitle: "Flix - Query Three"}); 
 });
 
+//Actors, Oscars
 router.post('/querythree', async (req, res, next) => {
 
     let from_year = req.body.fromyear;
@@ -419,6 +413,7 @@ router.post('/querythree', async (req, res, next) => {
     res.render('querythree.ejs', {pagetitle: "Flix - Query Three", first_query: true, data: ActorData, chartOptions: chartOptions}); 
 });
 
+//Directors, Oscars
 router.post('/querythreep2', async (req, res, next) => {
 
     let from_year = req.body.fromyear;
@@ -484,11 +479,12 @@ router.post('/querythreep2', async (req, res, next) => {
     res.render('querythree.ejs', {pagetitle: "Flix - Query Three", second_query: true, data: DirectorData, chartOptions: chartOptions}); 
 });
 
+//Ratings, Oscars
 router.post('/querythreep3', async (req, res, next) => {
 
     let from_year = req.body.fromyear;
-    let to_year = req.body.toyear;    
-
+    let to_year = req.body.toyear;
+ 
     let statement = `SELECT Year, CAST(AVG(MetaScore) AS decimal(5,2)), CAST(AVG(RottenTomatoes) AS decimal(5,2)), CAST(AVG(ImdbAvg)*10 AS decimal(5,2)) 
     FROM (SELECT * FROM CriticRatings JOIN (SELECT MovieID as ID, Year, ImdbAvg FROM Movie JOIN Awards ON Movie.ID = Awards.MovieID WHERE Oscars > 0) ON CriticRatings.MovieID = ID)
     GROUP BY Year ORDER BY YEAR ASC`
@@ -577,6 +573,14 @@ router.post('/querythreep3', async (req, res, next) => {
 });
 
 router.get('/queryfour', (req, res, next) => {
+    res.render('queryfour.ejs', {pagetitle: "Flix - Query Four"}); 
+});
+
+//Runtime per month
+router.post('/queryfour', (req, res, next) => {
+
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
     res.render('queryfour.ejs', {pagetitle: "Flix - Query Four"}); 
 });
 
