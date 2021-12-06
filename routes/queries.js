@@ -82,7 +82,7 @@ router.post('/queryonep2', async (req, res, next) => {
     
     let from_year = req.body.fromyear;
     let to_year = req.body.toyear;
-    const genres = req.body.genres;
+    let genres = req.body.genres;
     
     if(from_year < 1970){
         from_year = 1970;
@@ -100,6 +100,13 @@ router.post('/queryonep2', async (req, res, next) => {
     let final_genres = [];
 
     let where_clause = ``;
+
+    //if only one genre
+    if(typeof genres == "string"){
+        let tempStr = genres;
+        genres = [];
+        genres.push(tempStr);
+    }
 
     for(let i=0; i < genres.length; i++){
 
@@ -491,9 +498,7 @@ router.post('/querythreep3', async (req, res, next) => {
     
     statement = `SELECT * FROM (` + statement + `) WHERE Year BETWEEN ${from_year} AND ${to_year}`;
 
-    const result = await query(statement);
-    
-    console.log(result);
+    const result = await query(statement);    
 
     let chartOptions = {
         options: {
@@ -518,13 +523,6 @@ router.post('/querythreep3', async (req, res, next) => {
     let RatingsData = {
         labels: [],
         datasets: []
-    };
-    
-    let data = {        
-        label: "Number of Oscars",
-        data: [],
-        borderColor: ['rgba(142, 36, 170, 1)'], 
-        backgroundColor: ['rgba(38, 166, 154, .65)']              
     };
     
     let RottenTomatoes = {
@@ -577,11 +575,165 @@ router.get('/queryfour', (req, res, next) => {
 });
 
 //Runtime per month
-router.post('/queryfour', (req, res, next) => {
+router.post('/queryfour', async (req, res, next) => {
+
+    let user_years = req.body.years;    
 
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    res.render('queryfour.ejs', {pagetitle: "Flix - Query Four"}); 
+    let years = [];
+
+    //if only one year
+    if(typeof user_years == "string"){
+        let tempInt = parseInt(user_years);
+        user_years = [];
+        user_years.push(tempInt);
+    }
+    
+    for(let i=0; i < user_years.length; i++){
+        
+        years.push(user_years[i]);
+        
+        if(i == 3 || i == (user_years.length-1)){
+            break;          
+        }                
+    }
+
+    let statement = ``;
+
+    for(let i=0; i < years.length; i++){
+
+        statement += `SELECT Month, Year, CAST(AVG(Runtime) as decimal(5,2)) FROM (
+        SELECT Runtime, substr(released, 4, 3) as Month, Year FROM Movie)
+        WHERE Month IS NOT NULL AND Year = ${years[i]}
+        GROUP BY Month, Year`;
+
+        if(i != years.length-1){
+            statement += ` UNION `;
+        }
+        else{
+            statement += ` ORDER BY Year`;
+        }
+
+    }
+
+    const result = await query(statement);
+
+    let year_label = "";
+
+    for(let i=0; i < years.length; i++){
+        year_label += `${years[i]}` ;
+
+        if(i != years.length-1){
+            year_label += ", "
+        }
+    }
+    
+    let dataYear1 = {
+        label: "",
+        data: [],
+        lineTension: 0,
+        fill: false,
+        borderColor: 'rgba(255, 99, 132, 1)',
+        backgroundColor: 'rgba(54, 162, 235, .85)',
+        borderWidth: 1,        
+    };    
+    
+    let dataYear2 = {
+        label:"",
+        data: [],
+        lineTension: 0,
+        fill: false,
+        borderColor: 'rbga(193, 30, 222, 1)',
+        backgroundColor: 'rgba(38, 166, 154, .85)',
+        borderWidth: 1,
+    };
+    
+    let dataYear3 = {
+        label:"",
+        data: [],
+        lineTension: 0,
+        fill: false,
+        borderColor: 'rgba(99, 164, 255,1)',
+        backgroundColor: 'rgba(255, 99, 132, .85)',
+        borderWidth: 1,
+    };
+
+    let dataYear4 = {
+        label:"",
+        data: [],
+        lineTension: 0,
+        fill: false,
+        borderColor: 'rgba(95, 31, 222, 1)',
+        backgroundColor: 'rgba(190, 31, 222, .85)',
+        borderWidth: 1,
+    };
+
+    let runtimeData = {
+        labels: months,
+        datasets: []
+    };
+
+    let chartOptions = {
+        legend: {
+            display: true,
+            position: 'top',
+            labels: {
+                boxWidth: 80,
+            }
+        },
+        scales: {
+            y: {
+                min: 0
+            }
+        },
+        plugins: {
+            title: {
+                display: true,
+                font: {
+                    size: 22
+                },
+                text: `Average Runtime of Movies Per Month from ${year_label}`
+            }
+        }
+    };
+
+    for(let i=0; i < years.length; i++){
+        
+        if(dataYear1.label == ""){
+            dataYear1.label = years[i].toString();
+        }
+        else if(dataYear2.label == ""){
+            dataYear2.label = years[i].toString();
+        }
+        else if(dataYear3.label == ""){
+            dataYear3.label = years[i].toString();
+        }
+        else if(dataYear4.label == ""){
+            dataYear4.label = years[i].toString();
+        }
+    }
+
+    let yearData = [dataYear1, dataYear2, dataYear3, dataYear4];
+
+    for(let i=0; i < yearData.length; i++){
+
+        for(let j=0; j < months.length; j++){
+            
+            for(let k=0; k < result.length; k++){
+
+                if(yearData[i].label == result[k][1] && result[k][0] == months[j]){
+                    yearData[i].data.push(result[k][2]);
+                }
+            }
+        }
+    }
+
+    for(let i=0; i < years.length; i++){
+        runtimeData.datasets.push(yearData[i]);
+    }
+    
+    res.render('queryfour.ejs', {pagetitle: "Flix - Query Four", chartOptions: chartOptions, data: runtimeData, first_query: true}); 
 });
 
 router.get('/queryfive', (req, res, next) => {
