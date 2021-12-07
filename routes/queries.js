@@ -42,7 +42,7 @@ router.post('/queryone', async (req, res, next) => {
     let genreData = {
         labels: data_labels,
         datasets: [{
-            label: 'Number of Films',
+            label: 'Number of Movies',
             data: data_values,
             backgroundColor: [
                 'rgba(54, 162, 235, 0.65)',
@@ -69,7 +69,7 @@ router.post('/queryone', async (req, res, next) => {
                 font: {
                     size: 22
                 },
-                text: `Number of Movie Genres From ${input_year}`,
+                text: `Number of Movies By Genre Type From ${input_year}`,
             }
         }
     };
@@ -159,7 +159,11 @@ router.post('/queryonep2', async (req, res, next) => {
         },
         scales: {
             y: {
-                min: 0
+                min: 0,
+                title: {
+                    display: true,
+                    text: "Percentage"
+                }
             }
         },
         plugins: {
@@ -684,7 +688,11 @@ router.post('/queryfour', async (req, res, next) => {
         },
         scales: {
             y: {
-                min: 0
+                min: 0,
+                title: {
+                    display: true,
+                    title: "Runtime in Minutes"
+                }
             }
         },
         plugins: {
@@ -738,6 +746,82 @@ router.post('/queryfour', async (req, res, next) => {
 
 router.get('/queryfive', (req, res, next) => {
     res.render('queryfive.ejs', {pagetitle: "Flix - Query Five"}); 
+});
+
+//Histogram per year
+router.post('/queryfive', async (req, res, next) => {
+    
+    let input_year = req.body.year;
+    const imdb = req.body.imdb;
+    const rotten = req.body.rotten;
+    const meta = req.body.meta;   
+
+    let statement = ``;
+
+    let source = ``;
+
+    if(rotten == "on" && imdb === undefined && meta === undefined){
+         source = `RottenTomatoes`;
+    }
+    else if(meta == "on" && imdb === undefined && rotten === undefined){
+        source = `MetaScore`;
+    }
+    else if(imbd == "on" && meta === undefined && rotten === undefined){
+        source = `imdbavg`;
+    }
+
+    let ranges = [0,10,20,30,40,50,60,70,80,90,100];
+
+    for(let i=0; i < ranges.length-1;i++){
+
+           statement += `SELECT COUNT(${source}) FROM (SELECT imdbavg*10 AS imdbavg, RottenTomatoes, MetaScore, Year FROM Movie JOIN CriticRatings ON Movie.ID = CriticRatings.MovieID)
+           WHERE Year = ${input_year} and imdbavg >= ${i} and imdbavg < ${i+1}`;
+
+           if(i != ranges.length-1){
+               statement += `UNION ALL`;
+           }
+    }
+
+
+    const result = await query(statement);
+    console.log(result);    
+
+    // let genreData = {
+    //     labels: data_labels,
+    //     datasets: [{
+    //         label: 'Number of Films',
+    //         data: data_values,
+    //         backgroundColor: [
+    //             'rgba(54, 162, 235, 0.65)',
+    //         ],
+    //         borderColor: [
+    //             'rgba(255, 99, 132, 1)'
+    //         ],
+    //         borderWidth: 1
+    //     }]
+    // };
+
+    // let chartOptions = {
+    //     options: {
+    //         scales: {
+    //             y:{
+    //                 beginAtZero: true
+    //             }
+    //         },
+    //         responsive: true
+    //     },
+    //     plugins: {
+    //         title: {
+    //             display: true,
+    //             font: {
+    //                 size: 22
+    //             },
+    //             text: `Number of Movie Genres From ${input_year}`,
+    //         }
+    //     }
+    // };
+
+    res.render('queryone.ejs', {pagetitle: "Flix - Genres", data: genreData, chartOptions: chartOptions, first_query: true}); 
 });
 
 module.exports = router;
