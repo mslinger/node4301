@@ -5,7 +5,7 @@ const query = require('../util/query.js')
 const router = express.Router();
 
 router.get('/queryone', (req, res, next) => {
-    res.render('queryone.ejs', {pagetitle: "Flix - Query One", data: 0, year: 0}); 
+    res.render('queryone.ejs', {pagetitle: "Flix - Genres", data: 0, year: 0}); 
 });
 
 //Genre per year
@@ -74,7 +74,7 @@ router.post('/queryone', async (req, res, next) => {
         }
     };
 
-    res.render('queryone.ejs', {pagetitle: "Flix - Query One", data: genreData, chartOptions: chartOptions, first_query: true}); 
+    res.render('queryone.ejs', {pagetitle: "Flix - Genres", data: genreData, chartOptions: chartOptions, first_query: true}); 
 });
 
 //Genre percentage over years
@@ -283,11 +283,11 @@ router.post('/queryonep2', async (req, res, next) => {
         genreData.datasets.push(data_Genres[i]);
     }
 
-    res.render('queryone.ejs', {pagetitle: "Flix - Query One", chartOptions: chartOptions, data: genreData, second_query: true}); 
+    res.render('queryone.ejs', {pagetitle: "Flix - Genres", chartOptions: chartOptions, data: genreData, second_query: true}); 
 });
 
 router.get('/querytwo', async (req, res, next) => {
-    res.render('querytwo.ejs', {pagetitle: "Flix - Query Two"}); 
+    res.render('querytwo.ejs', {pagetitle: "Flix - Earnings"}); 
 });
 
 //Earnings per month
@@ -347,11 +347,11 @@ router.post('/querytwo', async (req, res, next) => {
     }; 
     
     
-    res.render('querytwo.ejs', {pagetitle: "Flix - Query Two", data: pieData, chartOptions: chartOptions, first_query: true}); 
+    res.render('querytwo.ejs', {pagetitle: "Flix - Earnings", data: pieData, chartOptions: chartOptions, first_query: true}); 
 });
 
 router.get('/querythree', (req, res, next) => {
-    res.render('querythree.ejs', {pagetitle: "Flix - Query Three"}); 
+    res.render('querythree.ejs', {pagetitle: "Flix - Oscars"}); 
 });
 
 //Actors, Oscars
@@ -417,7 +417,7 @@ router.post('/querythree', async (req, res, next) => {
 
     ActorData.datasets.push(data);
 
-    res.render('querythree.ejs', {pagetitle: "Flix - Query Three", first_query: true, data: ActorData, chartOptions: chartOptions}); 
+    res.render('querythree.ejs', {pagetitle: "Flix - Oscars", first_query: true, data: ActorData, chartOptions: chartOptions}); 
 });
 
 //Directors, Oscars
@@ -483,7 +483,7 @@ router.post('/querythreep2', async (req, res, next) => {
 
     DirectorData.datasets.push(data);
 
-    res.render('querythree.ejs', {pagetitle: "Flix - Query Three", second_query: true, data: DirectorData, chartOptions: chartOptions}); 
+    res.render('querythree.ejs', {pagetitle: "Flix - Oscars", second_query: true, data: DirectorData, chartOptions: chartOptions}); 
 });
 
 //Ratings, Oscars
@@ -567,11 +567,11 @@ router.post('/querythreep3', async (req, res, next) => {
     RatingsData.datasets = [MetaScore, RottenTomatoes, ImdbAvg];
     
 
-    res.render('querythree.ejs', {pagetitle: "Flix - Query Three", third_query: true, data: RatingsData, chartOptions: chartOptions}); 
+    res.render('querythree.ejs', {pagetitle: "Flix - Oscars", third_query: true, data: RatingsData, chartOptions: chartOptions}); 
 });
 
 router.get('/queryfour', (req, res, next) => {
-    res.render('queryfour.ejs', {pagetitle: "Flix - Query Four"}); 
+    res.render('queryfour.ejs', {pagetitle: "Flix - Runtime"}); 
 });
 
 //Runtime per month
@@ -733,7 +733,7 @@ router.post('/queryfour', async (req, res, next) => {
         runtimeData.datasets.push(yearData[i]);
     }
     
-    res.render('queryfour.ejs', {pagetitle: "Flix - Query Four", chartOptions: chartOptions, data: runtimeData, first_query: true}); 
+    res.render('queryfour.ejs', {pagetitle: "Flix - Runtime", chartOptions: chartOptions, data: runtimeData, first_query: true}); 
 });
 
 router.get('/queryfive', (req, res, next) => {
