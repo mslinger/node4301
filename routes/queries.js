@@ -320,7 +320,7 @@ router.post('/querytwo', async (req, res, next) => {
 
     let monthlyData = {
         data: [],
-        backgroundColor: ['rgba(54, 81, 235,1)','rgba(54, 81, 200,1)','rgba(54, 162, 235, 1)', 'rgba(255, 99, 132, 1)', 'rgba(38, 166, 154, 1)', 'rgba(142, 36, 170, 1)', 'rgba(46, 42, 93, 1)', 'rgba(2,55,136,1)', 'rgba(255,108,17,1)', 'rgba(45,226,230,1)', 'rgba(93, 164, 166,1)','rgba(140,30,255,1)'],
+        backgroundColor: ['rgba(27, 81, 117,1)','rgba(41, 122, 176, 1)','rgba(102, 155, 239, 1)','rgba(114, 153, 239, 1)','rgba(142, 146, 237, 1)','rgba(177, 135, 227, 1)','rgba(207, 123, 211, 1)','rgba(231, 112, 189, 1)','rgba(247, 103, 162, 1)','rgba(255, 99, 132, 1)', 'rgba(223, 87, 116,1)','rgba(191, 74, 99, 1)'],
         hoverOffset: 5
     }
 
@@ -355,7 +355,7 @@ router.post('/querytwo', async (req, res, next) => {
                 font: {
                     size: 22
                 },
-                text: `Total Movie Earnings Per Month From ${input_year}`
+                text: `Total Movie Earnings in Millions Per Month From ${input_year}`
             }
         },
         responsive: false,
@@ -680,7 +680,7 @@ router.post('/queryfour', async (req, res, next) => {
         lineTension: 0,
         fill: false,
         borderColor: 'rgba(95, 31, 222, 1)',
-        backgroundColor: 'rgba(190, 31, 222, .85)',
+        backgroundColor: 'rgba(159, 121, 236, .85)',
         borderWidth: 1,
     };
 
