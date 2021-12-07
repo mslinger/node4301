@@ -162,7 +162,7 @@ router.post('/queryonep2', async (req, res, next) => {
                 min: 0,
                 title: {
                     display: true,
-                    text: "Percentage"
+                    text: "Percentage of Total Movies"
                 }
             }
         },
@@ -337,6 +337,7 @@ router.post('/querytwo', async (req, res, next) => {
             }
         },
         scales: {
+            
         },
         plugins: {
             title: {
@@ -365,7 +366,7 @@ router.post('/querythree', async (req, res, next) => {
     let to_year = req.body.toyear;    
 
     let statement = `SELECT FullName, SUM(Oscars) FROM (
-        SELECT FullName, Oscars, Year FROM Movie JOIN Actor ON Movie.ID = Actor.MovieID JOIN Awards ON Movie.ID = Awards.MovieID WHERE Oscars IS NOT NULL)
+        SELECT FullName, Oscars, Year FROM Movie JOIN Actor ON Movie.ID = Actor.MovieID JOIN Awards ON Movie.ID = Awards.MovieID WHERE Oscars > 0)
         WHERE Year BETWEEN ${from_year} AND ${to_year}
         GROUP BY FullName, Oscars
         ORDER BY OSCARS DESC`;
@@ -379,7 +380,7 @@ router.post('/querythree', async (req, res, next) => {
         indexAxis: 'y',
         elements: {
             bar: {
-              borderWidth: 2,
+              borderWidth: 1,
             }
         },
         scales: {
@@ -431,7 +432,7 @@ router.post('/querythreep2', async (req, res, next) => {
     let to_year = req.body.toyear;    
 
     let statement = `SELECT FullName, SUM(Oscars) FROM (
-        SELECT FullName, Oscars, Year FROM Movie JOIN Director ON Movie.ID = Director.MovieID JOIN Awards ON Movie.ID = Awards.MovieID WHERE Oscars IS NOT NULL)
+        SELECT FullName, Oscars, Year FROM Movie JOIN Director ON Movie.ID = Director.MovieID JOIN Awards ON Movie.ID = Awards.MovieID WHERE Oscars > 0)
         WHERE Year BETWEEN ${from_year} AND ${to_year}
         GROUP BY FullName, Oscars
         ORDER BY OSCARS DESC`;
@@ -691,8 +692,8 @@ router.post('/queryfour', async (req, res, next) => {
                 min: 0,
                 title: {
                     display: true,
-                    title: "Runtime in Minutes"
-                }
+                    text: "Runtime in Minutes"
+                },
             }
         },
         plugins: {
@@ -745,10 +746,10 @@ router.post('/queryfour', async (req, res, next) => {
 });
 
 router.get('/queryfive', (req, res, next) => {
-    res.render('queryfive.ejs', {pagetitle: "Flix - Query Five"}); 
+    res.render('queryfive.ejs', {pagetitle: "Flix - Ratings"}); 
 });
 
-//Histogram per year
+//Histogram per year from RT, IMDb, or Meta
 router.post('/queryfive', async (req, res, next) => {
     
     let input_year = req.body.year;
@@ -757,71 +758,92 @@ router.post('/queryfive', async (req, res, next) => {
     const meta = req.body.meta;   
 
     let statement = ``;
-
     let source = ``;
+    let source_title = '';
 
     if(rotten == "on" && imdb === undefined && meta === undefined){
          source = `RottenTomatoes`;
+         source_title = "Rotten Tomatoes";
     }
     else if(meta == "on" && imdb === undefined && rotten === undefined){
         source = `MetaScore`;
+        source = "MetaScore";
     }
-    else if(imbd == "on" && meta === undefined && rotten === undefined){
+    else if(imdb == "on" && meta === undefined && rotten === undefined){
         source = `imdbavg`;
+        source_title = "IMDb";
+    }
+    else{
+        source = `imdbavg`;
+        source_title = "IMDb";
     }
 
     let ranges = [0,10,20,30,40,50,60,70,80,90,100];
 
-    for(let i=0; i < ranges.length-1;i++){
+    for(let i=0; i < ranges.length-1;i++){            
 
+        if(i == ranges.length-2){
            statement += `SELECT COUNT(${source}) FROM (SELECT imdbavg*10 AS imdbavg, RottenTomatoes, MetaScore, Year FROM Movie JOIN CriticRatings ON Movie.ID = CriticRatings.MovieID)
-           WHERE Year = ${input_year} and imdbavg >= ${i} and imdbavg < ${i+1}`;
+           WHERE Year = ${input_year} and ${source} >= ${ranges[i]} and ${source} <= ${ranges[i+1]}`;
+        }
+        else{
+            statement += `SELECT COUNT(${source}) FROM (SELECT imdbavg*10 AS imdbavg, RottenTomatoes, MetaScore, Year FROM Movie JOIN CriticRatings ON Movie.ID = CriticRatings.MovieID)
+           WHERE Year = ${input_year} and ${source} >= ${ranges[i]} and ${source} < ${ranges[i+1]}`;
+        }
 
-           if(i != ranges.length-1){
-               statement += `UNION ALL`;
-           }
+        if(i != ranges.length-2){
+            statement += ` UNION ALL `;
+        }
+    }  
+
+    const result = await query(statement);   
+    
+    let data_values = [];
+    let data_labels = ["0-10","10-20","20-30","30-40","40-50","50-60","60-70","70-80","80-90","90-100"];
+
+    for(let i=0; i < result.length; i++){        
+        data_values.push(result[i][0]);
     }
 
+    let RatingData = {
+        labels: data_labels,
+        datasets: [{
+            label: 'Number of Ratings',
+            data: data_values,
+            backgroundColor: [
+                'rgba(38, 166, 154, .65)'                
+            ],
+            borderColor: [                
+                'rgba(54, 162, 235, 1)'
+            ],
+            borderWidth: 1,
+            barPercentage: 1,
+            categoryPercentage: 1,
+        }]
+    };
 
-    const result = await query(statement);
-    console.log(result);    
+    let chartOptions = {
+        scales: {
+            y:{
+                beginAtZero: true,
+                title:{
+                    display: true,
+                    text: "Number of Total Ratings",
+                }                    
+            }            
+        },        
+        plugins: {
+            title: {
+                display: true,
+                font: {
+                    size: 22
+                },
+                text: `Histogram of Ratings From ${source_title} for ${input_year}`,
+            }
+        }
+    };
 
-    // let genreData = {
-    //     labels: data_labels,
-    //     datasets: [{
-    //         label: 'Number of Films',
-    //         data: data_values,
-    //         backgroundColor: [
-    //             'rgba(54, 162, 235, 0.65)',
-    //         ],
-    //         borderColor: [
-    //             'rgba(255, 99, 132, 1)'
-    //         ],
-    //         borderWidth: 1
-    //     }]
-    // };
-
-    // let chartOptions = {
-    //     options: {
-    //         scales: {
-    //             y:{
-    //                 beginAtZero: true
-    //             }
-    //         },
-    //         responsive: true
-    //     },
-    //     plugins: {
-    //         title: {
-    //             display: true,
-    //             font: {
-    //                 size: 22
-    //             },
-    //             text: `Number of Movie Genres From ${input_year}`,
-    //         }
-    //     }
-    // };
-
-    res.render('queryone.ejs', {pagetitle: "Flix - Genres", data: genreData, chartOptions: chartOptions, first_query: true}); 
+    res.render('queryfive.ejs', {pagetitle: "Flix - Ratings", data: RatingData, chartOptions: chartOptions, first_query: true}); 
 });
 
 module.exports = router;

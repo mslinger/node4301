@@ -5,9 +5,74 @@
     <main>
     <div class="container">
         <div class="row">
-            <h2>Query Five</h2>
-            <p>This query aims to distinguish the success of Foreign films in comparison to that of Domestic films within a distinguished year. This will combine the overall consumer and critic review of all films to get a consensus of how well either foreign or international films were perceived in a year</p>
+            <h2>Ratings</h2>
+            <p>The visulization below shows a histogram for the number of ratings for a specific year from a specific source. 
+                Valid years are from 1970 to 2020 and there are three sources, IMBDb, Rotten Tomatoes, or MetaCritic. If none are selected, or multiple are selected, IMBDb will be the default option.</p>
         </div>
     </div>
+    <div class="container">
+        <div class="row">
+            <div class="col m6 offset-m3">
+            <div class="card grey lighten-4 z-depth-2">
+                <div class="card-content pink-text darken-3">
+                    <span class="card-title">Histogram of Ratings by Source per Year</span>
+                    <form action="/queryfive" method="POST">
+                    <div class="input field">
+                        <label for="year">Year</label>
+                        <input class="validate" type="number" name="year" min="1970" max="2020" required>                        
+                    </div>
+                    <div>
+                    <label style="margin: 5px;">
+                        <input type="checkbox" class="filled-in" name="imdb"/>
+                        <span>IMDb</span>
+                    </label>
+                    <label style="margin: 5px">
+                        <input type="checkbox" class="filled-in" name="rotten"/>
+                        <span>Rotten Tomatoes</span>
+                    </label>
+                    <label style="margin: 5px">
+                        <input type="checkbox" class="filled-in" name="meta"/>
+                        <span>MetaScore</span>
+                    </label>
+                    </div>
+                    <br>
+                    <button class="btn purple darken-1" type="submit">Submit</button>
+                    </form>                    
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <% if((typeof(first_query) == "undefined") ? '' : first_query) { %>           
+            <canvas id="barChart" width="900" height="500"></canvas>
+            
+            <script>
+                let status = '<%= (typeof(first_query) == "undefined") ? '' : first_query %>';                
+            
+                let RatingData;
+                let chartOptions;                      
 
+                if(status == 'true'){
+
+                    //Chart Data
+                    RatingData = '<%- JSON.stringify(data)%>'
+                    RatingData = JSON.parse(RatingData);
+                
+                    //Chart Options
+                    chartOptions = '<%- JSON.stringify(chartOptions)%>'
+                    chartOptions = JSON.parse(chartOptions);
+                }
+    
+                const ctx = document.getElementById('barChart').getContext('2d');
+                const myChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: RatingData,
+                    options: chartOptions,
+                });
+            </script>
+            <% } %>            
+        </div>
+    </div>
 <%- include('./includes/end.ejs') %>
