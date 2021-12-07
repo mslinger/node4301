@@ -83,7 +83,7 @@ router.post('/queryonep2', async (req, res, next) => {
     let from_year = req.body.fromyear;
     let to_year = req.body.toyear;
     let genres = req.body.genres;
-    
+        
     if(from_year < 1970){
         from_year = 1970;
     }
@@ -93,6 +93,16 @@ router.post('/queryonep2', async (req, res, next) => {
     else if(to_year == from_year){
         to_year = parseInt(to_year);
         to_year += 1;
+    }
+
+    if(from_year > to_year){
+        let temp = from_year;
+        to_year = from_year;
+        from_year = temp;
+    }
+
+    if(genres === undefined){
+        genres = ["Drama"];
     }
     
     let years = [];    
@@ -767,7 +777,7 @@ router.post('/queryfive', async (req, res, next) => {
     }
     else if(meta == "on" && imdb === undefined && rotten === undefined){
         source = `MetaScore`;
-        source = "MetaScore";
+        source_title = "MetaScore";
     }
     else if(imdb == "on" && meta === undefined && rotten === undefined){
         source = `imdbavg`;
@@ -838,7 +848,7 @@ router.post('/queryfive', async (req, res, next) => {
                 font: {
                     size: 22
                 },
-                text: `Histogram of Ratings From ${source_title} for ${input_year}`,
+                text: `Histogram of Ratings From ${source_title} for ${input_year} Movies`,
             }
         }
     };
