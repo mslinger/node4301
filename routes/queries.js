@@ -553,7 +553,7 @@ router.post('/querythreep3', async (req, res, next) => {
     };
 
     //load years into labels
-    for(let i=from_year; i < to_year; i++){
+    for(let i=from_year; i <= to_year; i++){
         RatingsData.labels.push(i);        
     }
 
